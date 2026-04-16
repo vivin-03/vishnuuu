@@ -14,3 +14,357 @@ to the Git repository [10].
 • Configure Jenkins to create a pipeline project that builds, tests, and deploys the
 application using Docker and Kubernetes, and visualize the deployment through
 Docker Desktop [20].
+Got it — I’ll give you a **clean, step-by-step lab manual style answer** so you can **execute + write in record directly**.
+
+---
+
+# 🧾 **PROJECT: University Department Web Page with DevOps Pipeline**
+
+---
+
+# 🔹 PART 1: Create HTML Web Page
+
+## Step 1: Create Project Folder
+
+```bash
+mkdir department-website
+cd department-website
+```
+
+---
+
+## Step 2: Create `index.html`
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Computer Science Department</title>
+    <style>
+        body { font-family: Arial; margin: 0; }
+        header { background: #003366; color: white; padding: 20px; text-align: center; }
+        nav { background: #005599; padding: 10px; text-align: center; }
+        nav a { color: white; margin: 10px; text-decoration: none; }
+        section { padding: 20px; }
+        footer { background: #003366; color: white; text-align: center; padding: 10px; }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>XYZ University</h1>
+    <p>Department of Computer Science</p>
+    <p>Head: Dr. A. Kumar</p>
+</header>
+
+<nav>
+    <a href="#about">About</a>
+    <a href="#courses">Courses</a>
+    <a href="#faculty">Faculty</a>
+    <a href="#contact">Contact</a>
+</nav>
+
+<section id="about">
+    <h2>About Department</h2>
+    <p>Focuses on AI, Data Science, and Software Development.</p>
+</section>
+
+<section id="courses">
+    <h2>Courses</h2>
+    <ul>
+        <li>B.Tech CSE</li>
+        <li>M.Tech AI</li>
+        <li>Data Science</li>
+    </ul>
+</section>
+
+<section id="faculty">
+    <h2>Faculty</h2>
+    <ul>
+        <li>Dr. A. Kumar – AI</li>
+        <li>Prof. B. Singh – Data Science</li>
+    </ul>
+</section>
+
+<section id="contact">
+    <h2>Contact</h2>
+    <p>Chennai, India</p>
+    <p>Phone: 9876543210</p>
+    <p>Email: cse@xyz.com</p>
+</section>
+
+<footer>
+    <p>© 2026 XYZ University</p>
+</footer>
+
+</body>
+</html>
+```
+
+👉 Open in browser → verify working
+
+---
+
+# 🔹 PART 2: GitHub Repository
+
+## Step 1: Create Repo
+
+Go to GitHub → Create repository
+Name: `department-website`
+
+---
+
+## Step 2: Initialize Git
+
+```bash
+git init
+git add index.html
+git commit -m "Initial commit"
+```
+
+---
+
+## Step 3: Connect to GitHub
+
+```bash
+git remote add origin https://github.com/yourusername/department-website.git
+git branch -M main
+git push -u origin main
+```
+
+---
+
+# 🔹 PART 3: Clone into VS Code & Update
+
+## Step 1: Clone Repo
+
+```bash
+git clone https://github.com/yourusername/department-website.git
+cd department-website
+code .
+```
+
+---
+
+## Step 2: Make Changes (Example)
+
+Add a new course or faculty in `index.html`
+
+---
+
+## Step 3: Commit & Push
+
+```bash
+git add .
+git commit -m "Updated content"
+git push
+```
+
+---
+
+# 🔹 PART 4: Docker Containerization
+
+## Step 1: Create `Dockerfile`
+
+```dockerfile
+FROM nginx:alpine
+COPY index.html /usr/share/nginx/html/
+```
+
+---
+
+## Step 2: Build Image
+
+```bash
+docker build -t department-site .
+```
+
+---
+
+## Step 3: Run Container
+
+```bash
+docker run -d -p 8080:80 department-site
+```
+
+👉 Open: `http://localhost:8080`
+
+---
+
+# 🔹 PART 5: Kubernetes Deployment
+
+## Step 1: Create `deployment.yaml`
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dept-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dept
+  template:
+    metadata:
+      labels:
+        app: dept
+    spec:
+      containers:
+      - name: dept-container
+        image: department-site
+        ports:
+        - containerPort: 80
+```
+
+---
+
+## Step 2: Create `service.yaml`
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: dept-service
+spec:
+  type: NodePort
+  selector:
+    app: dept
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30007
+```
+
+---
+
+## Step 3: Apply Files
+
+```bash
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+```
+
+---
+
+## Step 4: Check Output
+
+```bash
+kubectl get pods
+kubectl get services
+```
+
+---
+
+# 🔹 PART 6: Jenkins CI/CD Pipeline
+
+## Step 1: Open Jenkins
+
+Go to: `http://localhost:8080`
+
+---
+
+## Step 2: Create Pipeline Project
+
+* Click **New Item**
+* Select **Pipeline**
+* Name: `Department-Pipeline`
+
+---
+
+## Step 3: Add Jenkinsfile
+
+```groovy
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Clone') {
+            steps {
+                git 'https://github.com/yourusername/department-website.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t department-site .'
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                sh 'docker run -d -p 8081:80 department-site'
+            }
+        }
+
+        stage('Deploy Kubernetes') {
+            steps {
+                sh 'kubectl apply -f deployment.yaml'
+                sh 'kubectl apply -f service.yaml'
+            }
+        }
+    }
+}
+```
+
+---
+
+## Step 4: Run Pipeline
+
+Click **Build Now**
+
+---
+
+# 🔹 PART 7: Docker Desktop Visualization
+
+## Steps:
+
+1. Open Docker Desktop
+2. Go to **Containers**
+3. See running container
+4. Enable Kubernetes in settings
+5. Run:
+
+```bash
+kubectl get all
+```
+
+---
+
+# 🔹 FINAL WORKFLOW (WRITE IN RECORD)
+
+```
+1. Designed HTML webpage
+2. Stored code in GitHub repository
+3. Cloned and updated using VS Code
+4. Containerized using Docker
+5. Deployed using Kubernetes
+6. Automated using Jenkins pipeline
+```
+
+---
+
+# 🔥 COMMON ERRORS (VERY IMPORTANT)
+
+| Problem             | Solution                |
+| ------------------- | ----------------------- |
+| Docker not running  | Start Docker Desktop    |
+| kubectl not working | Enable Kubernetes       |
+| Jenkins build fails | Check Docker permission |
+| Port not opening    | Check firewall          |
+
+---
+
+# 🎯 If you want next:
+
+I can give you:
+
+* 📄 **Complete record PDF (ready to submit)**
+* 🎨 **Better UI design (marks increase)**
+* 🖼️ **Screenshots for each step**
+* 💯 **Viva questions + answers**
+
+Just tell 👍
+
